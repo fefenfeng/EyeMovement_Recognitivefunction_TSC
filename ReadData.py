@@ -1,10 +1,10 @@
 import os
 import pandas as pd
-# import numpy as np
+import torch
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import Dataset, DataLoader
-import torch
+# from torch.utils.tensorboard import SummaryWriter
 
 
 def load_and_process_data(path):
@@ -25,15 +25,15 @@ def load_and_process_data(path):
             data[label][i] = scaler.fit_transform(data[label][i])   # 对每个类别每个数据进行标准化
 
     # Split into train, val, test
-    train_data, val_data, test_data = [], [], []
+    train_set, val_set, test_set = [], [], []
     for label in data:
         train, temp = train_test_split(data[label], test_size=0.3, random_state=42)
         val, test = train_test_split(temp, test_size=0.5, random_state=42)
-        train_data.extend([(x, label) for x in train])  # 将train中的data带上标签组成元组存入train_data
-        val_data.extend([(x, label) for x in val])
-        test_data.extend([(x, label) for x in test])
+        train_set.extend([(x, label) for x in train])  # 将train中的data带上标签组成元组存入train_data
+        val_set.extend([(x, label) for x in val])
+        test_set.extend([(x, label) for x in test])
 
-    return train_data, val_data, test_data
+    return train_set, val_set, test_set
 
 
 class MyDataset(Dataset):
@@ -49,44 +49,62 @@ class MyDataset(Dataset):
         return len(self.data)
 
 
-def create_dataloaders(path, batch_size=32):
-    train_data, val_data, test_data = load_and_process_data(path)
-
+if __name__ == '__main__':
+    # load data
+    train_data, val_data, test_data = load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"
+                                                            r"\data_info\trial1_sorted")
+    # 实例化dataset
     train_dataset = MyDataset(train_data)
     val_dataset = MyDataset(val_data)
     test_dataset = MyDataset(test_data)
-
+    # 创建dataloader
+    batch_size = 32
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
-    return train_loader, val_loader, test_loader
-
-
-if __name__ == '__main__':
-    # 创建数据加载器
-    train_loader, val_loader, test_loader = create_dataloaders(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial0_sorted", batch_size=32)
+    # # 测试dataset len函数
+    # train_dataset_len = len(train_dataset)
+    # print("训练数据集长度为:{}".format(train_dataset_len))
+    # val_dataset_len = len(val_dataset)
+    # print("验证数据集长度为:{}".format(val_dataset_len))
+    # test_dataset_len = len(test_dataset)
+    # print("测试数据集长度为:{}".format(test_dataset_len))
+    # # 测试dataset数据
+    # position, target = train_dataset[0]
+    # print(position.shape)
+    # print(target)
+    # # 检验是否标准化
+    # mean = torch.mean(position, dim=0)
+    # std = torch.std(position, dim=0)
+    # print("每一列的均值: ", mean)
+    # print("每一列的标准差: ", std)
+    # # 测试loader中的数据
+    # for sample in train_loader:
+    #     positions, targets = sample
+    #     print(positions.shape)
+    #     print(targets)
 
     # # 查看tensor尺寸
     # for batch in train_loader:
-    #     features, labels = batch
-    #     print(f'Train batch - features shape: {features.shape}, labels shape: {labels.shape}')
+    #     positions, targets = batch
+    #     print(f'Train batch - features shape: {positions.shape}, labels shape: {targets.shape}')
     #
     # for batch in val_loader:
-    #     features, labels = batch
-    #     print(f'Validation batch - features shape: {features.shape}, labels shape: {labels.shape}')
+    #     positions, targets = batch
+    #     print(f'Validation batch - features shape: {positions.shape}, labels shape: {targets.shape}')
     #
     # for batch in test_loader:
-    #     features, labels = batch
-    #     print(f'Test batch - features shape: {features.shape}, labels shape: {labels.shape}')
+    #     positions, targets = batch
+    #     print(f'Test batch - features shape: {positions.shape}, labels shape: {targets.shape}')
 
     # 查看tensor数据
-    # for i, (features, labels) in enumerate(train_loader):
-    #     for j in range(len(features)):
-    #         print(f'Feature {j}: {features[j]}')
-    #         a = features[j]
-    #         print(f'Label {j}: {labels[j]}')
-    #         b = labels[j]
+    # for i, (positions, targets) in enumerate(train_loader):
+    #     for j in range(len(positions)):
+    #         print(f'Feature {j}: {positions[j]}')
+    #         a = positions[j]
+    #         print(f'Label {j}: {targets[j]}')
+    #         b = targets[j]
     #         print('---')
     #     # 只打印第一个批次的数据
     #     if i == 0:
