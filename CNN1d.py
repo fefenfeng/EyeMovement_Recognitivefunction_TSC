@@ -24,7 +24,7 @@ class CNN1d(nn.Module):
             nn.Linear(4240, 256),
             nn.Linear(256, 64),
             nn.Linear(64, 10),
-            nn.Softmax(dim=1)
+            # nn.Softmax(dim=1)
         )
 
     def forward(self, x):
