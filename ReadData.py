@@ -42,26 +42,26 @@ class MyDataset(Dataset):
 
     def __getitem__(self, index):
         features, label = self.data[index]
-        return torch.tensor(features, dtype=torch.float32), torch.tensor(int(label), dtype=torch.long)
-        # 转换feature和label到tensor，float32和long
+        return torch.tensor(features.T, dtype=torch.float32), torch.tensor(int(label), dtype=torch.long)
+        # 转换feature和label到tensor，float32和long,.T转置将数据从（len，2），转为（2，len）
 
     def __len__(self):
         return len(self.data)
 
 
-if __name__ == '__main__':
-    # load data
-    train_data, val_data, test_data = load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"
-                                                            r"\data_info\trial1_sorted")
-    # 实例化dataset
-    train_dataset = MyDataset(train_data)
-    val_dataset = MyDataset(val_data)
-    test_dataset = MyDataset(test_data)
-    # 创建dataloader
-    batch_size = 32
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
+# if __name__ == '__main__':
+#     # load data
+#     train_data, val_data, test_data = load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"
+#                                                             r"\data_info\trial1_sorted")
+#     # 实例化dataset
+#     train_dataset = MyDataset(train_data)
+#     val_dataset = MyDataset(val_data)
+#     test_dataset = MyDataset(test_data)
+#     # 创建dataloader
+#     batch_size = 32
+#     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+#     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
+#     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
     # # 测试dataset len函数
     # train_dataset_len = len(train_dataset)
@@ -70,22 +70,23 @@ if __name__ == '__main__':
     # print("验证数据集长度为:{}".format(val_dataset_len))
     # test_dataset_len = len(test_dataset)
     # print("测试数据集长度为:{}".format(test_dataset_len))
-    # # 测试dataset数据
+    # # 测试dataset中数据
     # position, target = train_dataset[0]
     # print(position.shape)
     # print(target)
     # # 检验是否标准化
-    # mean = torch.mean(position, dim=0)
-    # std = torch.std(position, dim=0)
-    # print("每一列的均值: ", mean)
-    # print("每一列的标准差: ", std)
+    # position, target = train_dataset[0]
+    # mean = torch.mean(position, dim=1)
+    # std = torch.std(position, dim=1)
+    # print("均值: ", mean)
+    # print("标准差: ", std)
     # # 测试loader中的数据
     # for sample in train_loader:
     #     positions, targets = sample
     #     print(positions.shape)
     #     print(targets)
 
-    # # 查看tensor尺寸
+    # # 查看loader中tensor尺寸
     # for batch in train_loader:
     #     positions, targets = batch
     #     print(f'Train batch - features shape: {positions.shape}, labels shape: {targets.shape}')
@@ -98,7 +99,7 @@ if __name__ == '__main__':
     #     positions, targets = batch
     #     print(f'Test batch - features shape: {positions.shape}, labels shape: {targets.shape}')
 
-    # 查看tensor数据
+    # # 查看tensor数据
     # for i, (positions, targets) in enumerate(train_loader):
     #     for j in range(len(positions)):
     #         print(f'Feature {j}: {positions[j]}')
