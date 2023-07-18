@@ -39,7 +39,8 @@ if torch.cuda.is_available():
     loss_fn = loss_fn.cuda()
 # 优化器
 learning_rate = 1e-3
-optimizer = torch.optim.Adam(cnn1d.parameters(), lr=learning_rate)
+l2penalty = 1e-3
+optimizer = torch.optim.Adam(cnn1d.parameters(), lr=learning_rate, weight_decay=l2penalty)
 
 # 设置训练的一些参数
 total_train_step = 0   # 训练次数
