@@ -19,13 +19,14 @@ class CNN1d(nn.Module):
             nn.Conv1d(128, 256, 3, 1, 1),
             nn.ReLU(),
             nn.MaxPool1d(2),
+            nn.AdaptiveAvgPool1d(1),
             nn.Flatten(),
-            nn.Linear(265*256, 4240),
-            nn.Dropout(p=0.5),
-            nn.Linear(4240, 256),
-            nn.Dropout(p=0.5),
+            # nn.Linear(265*256, 4240),
+            # nn.Dropout(p=0.5),
+            # nn.Linear(4240, 256),
+            # nn.Dropout(p=0.5),
             nn.Linear(256, 64),
-            nn.Dropout(p=0.5),
+            # nn.Dropout(p=0.5),
             nn.Linear(64, 10),
             # nn.Softmax(dim=1)
         )
@@ -42,7 +43,7 @@ class CNN1d(nn.Module):
 # if __name__ == '__main__':
 #     # 创建实例
 #     cnn1d = CNN1d()
-#     # print(cnn1d)
+#     print(cnn1d)
 #     # 创建dataset和loader
 #     train_data, val_data, test_data = load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"
 #                                                             r"\data_info\trial1_sorted")
@@ -65,7 +66,7 @@ class CNN1d(nn.Module):
 #         print(output0.shape)
 #
 #
-#     input = torch.ones((16, 2, 33920))  # 16的batch size，2通道,len33920
-#     print(input.shape)
-#     output = cnn1d(input)
-#     print(output.shape)
+    # input = torch.ones((16, 2, 33920))  # 16的batch size，2通道,len33920
+    # print(input.shape)
+    # output = cnn1d(input)
+    # print(output.shape)
