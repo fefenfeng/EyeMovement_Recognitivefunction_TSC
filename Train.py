@@ -46,6 +46,11 @@ total_train_step = 0   # 训练次数
 total_val_step = 0   # 测试次数
 epoch = 100     # 训练轮数
 
+# early stopping设置
+best_val_loss = float('inf')
+patience_counter = 0
+patience_limit = 10
+
 # tensorboard记录
 writer = SummaryWriter("./Logs_tensorboard/CNN1d_1st_train")
 start_time = time.time()
@@ -98,4 +103,14 @@ for i in range(epoch):
     writer.add_scalar("Validation_loss", total_val_loss, total_val_step)
     writer.add_scalar("Validation_accuracy", total_val_accuracy/val_dataset_len, total_val_step)
     total_val_step = total_val_step + 1
+
+    # Early Stopping
+    if total_val_loss < best_val_loss:
+        best_val_loss = total_val_loss
+        patience_counter = 0
+    else:
+        patience_counter += 1
+        if patience_counter >= patience_limit:
+            print("val_loss已经连续{}轮没有改进了,在第{}轮早停".format(patience_limit, total_val_step))
+            break
 writer.close()
