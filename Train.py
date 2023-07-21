@@ -40,7 +40,7 @@ if torch.cuda.is_available():
 # define optimizer
 learning_rate = 1e-3
 l2penalty = 1e-3
-optimizer = torch.optim.Adam(cnn1d.parameters(), lr=learning_rate, weight_decay=l2penalty)
+optimizer = torch.optim.Adam(cnn1d.parameters(), lr=learning_rate, weight_decay=l2penalty)  # add L2 regularization
 
 # Set up for some parameters in training
 total_train_step = 0   # 训练次数
