@@ -2,6 +2,7 @@ import os
 import pandas as pd
 
 
+# resort the data by time and delete unused column
 def process_files(source_dir, target_dir):
     # 获取源文件夹中所有的csv文件
     csv_files = [f for f in os.listdir(source_dir) if f.endswith('.csv')]

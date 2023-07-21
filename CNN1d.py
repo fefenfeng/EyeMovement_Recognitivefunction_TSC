@@ -39,19 +39,19 @@ class CNN1d(nn.Module):
         return x
 
 
-# # 训练网络正确性
+# # test if net works
 # if __name__ == '__main__':
-#     # 创建实例
+#     # build instance
 #     cnn1d = CNN1d()
 #     print(cnn1d)
-#     # 创建dataset和loader
+#     # build dataset and dataloader
 #     train_data, val_data, test_data = load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"
 #                                                             r"\data_info\trial1_sorted")
-#     # 实例化dataset
+#     # dataset instantiation
 #     train_dataset = MyDataset(train_data)
 #     val_dataset = MyDataset(val_data)
 #     test_dataset = MyDataset(test_data)
-#     # 创建dataloader
+#     # build dataloader
 #     batch_size = 32
 #     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 #     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)

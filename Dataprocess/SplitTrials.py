@@ -1,6 +1,8 @@
 import os
 import shutil
 
+# split whole data folder into 2 trials
+
 folder_path = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\eye_centre_labels\left_eye"
 folder_0 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial0\0"
 folder_1 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial1\0"

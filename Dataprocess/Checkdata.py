@@ -3,6 +3,7 @@ import pandas as pd
 from collections import Counter
 
 
+# check abnormal length data file
 def check_csv_len(directory):
     len_counts = {}
     for filename in os.listdir(directory):
