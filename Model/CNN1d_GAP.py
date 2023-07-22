@@ -22,6 +22,7 @@ class CNN1d_GAP(nn.Module):
             nn.AdaptiveAvgPool1d(1),
             nn.Flatten(),
             nn.Linear(256, 64),
+            nn.Dropout(p=0.2),
             nn.Linear(64, 10),
         )
 
