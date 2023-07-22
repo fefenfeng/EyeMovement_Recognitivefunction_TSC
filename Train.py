@@ -4,7 +4,8 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from torch import nn
 from ReadData import load_and_process_data, MyDataset
-from CNN1d import CNN1d
+# from Model.CNN1d import CNN1d
+from Model.CNN1d_GAP import CNN1d_GAP
 import time
 
 # read data
@@ -30,9 +31,9 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
 # test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # networks model instantiation
-cnn1d = CNN1d()
+cnn1d_gap = CNN1d_GAP()
 if torch.cuda.is_available():
-    cnn1d = cnn1d.cuda()    # 转移到cuda上
+    cnn1d_gap = cnn1d_gap.cuda()    # 转移到cuda上
 # define loss function
 loss_fn = nn.CrossEntropyLoss()
 if torch.cuda.is_available():
@@ -40,7 +41,7 @@ if torch.cuda.is_available():
 # define optimizer
 learning_rate = 1e-3
 l2penalty = 1e-3
-optimizer = torch.optim.Adam(cnn1d.parameters(), lr=learning_rate, weight_decay=l2penalty)  # add L2 regularization
+optimizer = torch.optim.Adam(cnn1d_gap.parameters(), lr=learning_rate, weight_decay=l2penalty)  # add L2 regularization
 
 # Set up for some parameters in training
 total_train_step = 0   # 训练次数
@@ -58,13 +59,13 @@ start_time = time.time()
 for i in range(epoch):
     print("-------第 {} 轮训练开始-------".format(i+1))
     # training begin
-    cnn1d.train()   # turn to training mode
+    cnn1d_gap.train()   # turn to training mode
     for data in train_loader:
         positions, targets = data  # feature+label-->data
         if torch.cuda.is_available():
             positions = positions.cuda()
             targets = targets.cuda()
-        outputs = cnn1d(positions)
+        outputs = cnn1d_gap(positions)
         loss = loss_fn(outputs, targets)  # calculate loss
         optimizer.zero_grad()   # turn optimizer gradient--> zero
         loss.backward()     # backward propagation
@@ -84,7 +85,7 @@ for i in range(epoch):
             writer.add_scalar("Train_loss", loss.item(), total_train_step)
 
     # validation step
-    cnn1d.eval()
+    cnn1d_gap.eval()
     total_val_loss = 0  # loss and acc on validation set
     total_val_accuracy = 0
     with torch.no_grad():   # No gradient accumulation for the validation part
@@ -93,7 +94,7 @@ for i in range(epoch):
             if torch.cuda.is_available():
                 positions = positions.cuda()
                 targets = targets.cuda()
-            outputs = cnn1d(positions)
+            outputs = cnn1d_gap(positions)
             loss = loss_fn(outputs, targets)
             total_val_loss = total_val_loss + loss.item()
             accuracy = (outputs.argmax(1) == targets).sum()

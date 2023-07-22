@@ -19,16 +19,14 @@ class CNN1d(nn.Module):
             nn.Conv1d(128, 256, 3, 1, 1),
             nn.ReLU(),
             nn.MaxPool1d(2),
-            nn.AdaptiveAvgPool1d(1),
             nn.Flatten(),
-            # nn.Linear(265*256, 4240),
-            # nn.Dropout(p=0.5),
-            # nn.Linear(4240, 256),
-            # nn.Dropout(p=0.5),  # dropout regularization
+            nn.Linear(265*256, 4240),
+            nn.Dropout(p=0.5),
+            nn.Linear(4240, 256),
+            nn.Dropout(p=0.5),  # dropout regularization
             nn.Linear(256, 64),
-            # nn.Dropout(p=0.5),
+            nn.Dropout(p=0.5),
             nn.Linear(64, 10),
-            # nn.Softmax(dim=1)
         )
 
     def forward(self, x):
