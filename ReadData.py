@@ -27,8 +27,8 @@ def load_and_process_data(path):
     # Split into train, val, test
     train_set, val_set, test_set = [], [], []
     for label in data:
-        train, temp = train_test_split(data[label], test_size=0.3, random_state=37)
-        val, test = train_test_split(temp, test_size=0.5, random_state=37)
+        train, temp = train_test_split(data[label], test_size=0.3, random_state=10)
+        val, test = train_test_split(temp, test_size=0.5, random_state=10)
         train_set.extend([(x, label) for x in train])  # Stores tuples of data from train with labels into train_data
         val_set.extend([(x, label) for x in val])
         test_set.extend([(x, label) for x in test])
