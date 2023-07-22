@@ -27,8 +27,8 @@ def load_and_process_data(path):
     # Split into train, val, test
     train_set, val_set, test_set = [], [], []
     for label in data:
-        train, temp = train_test_split(data[label], test_size=0.3, random_state=42)
-        val, test = train_test_split(temp, test_size=0.5, random_state=42)
+        train, temp = train_test_split(data[label], test_size=0.3, random_state=37)
+        val, test = train_test_split(temp, test_size=0.5, random_state=37)
         train_set.extend([(x, label) for x in train])  # Stores tuples of data from train with labels into train_data
         val_set.extend([(x, label) for x in val])
         test_set.extend([(x, label) for x in test])
@@ -49,19 +49,19 @@ class MyDataset(Dataset):
         return len(self.data)
 
 
-if __name__ == '__main__':
-    # load data
-    train_data, val_data, test_data = load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"
-                                                            r"\data_info\trial1_sorted")
-    # dataset instantiation
-    train_dataset = MyDataset(train_data)
-    val_dataset = MyDataset(val_data)
-    test_dataset = MyDataset(test_data)
-    # build dataloader
-    batch_size = 32
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
+# if __name__ == '__main__':
+#     # load data
+#     train_data, val_data, test_data = load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"
+#                                                             r"\data_info\trial1_sorted")
+#     # dataset instantiation
+#     train_dataset = MyDataset(train_data)
+#     val_dataset = MyDataset(val_data)
+#     test_dataset = MyDataset(test_data)
+#     # build dataloader
+#     batch_size = 32
+#     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+#     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
+#     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
     # # test dataset.__len__
     # train_dataset_len = len(train_dataset)

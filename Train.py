@@ -39,22 +39,22 @@ loss_fn = nn.CrossEntropyLoss()
 if torch.cuda.is_available():
     loss_fn = loss_fn.cuda()
 # define optimizer
-learning_rate = 5e-5
+learning_rate = 1e-3
 # l2penalty = 1e-3
 # optimizer = torch.optim.Adam(cnn1d_gap.parameters(), lr=learning_rate, weight_decay=l2penalty)  # add L2 regularization
 optimizer = torch.optim.Adam(cnn1d_gap.parameters(), lr=learning_rate)
 # Set up for some parameters in training
 total_train_step = 0   # 训练次数
 total_val_step = 0   # 测试次数
-epoch = 1000     # 训练轮数
+epoch = 2000     # 训练轮数
 
 # early stopping
 best_val_loss = float('inf')
 patience_counter = 0
-patience_limit = 50
+patience_limit = 2000
 
 # tensorboard
-writer = SummaryWriter("./Logs_tensorboard/CNN1d_GAP_3rd")
+writer = SummaryWriter("./Logs_tensorboard/CNN1dGAP_bestlr")
 start_time = time.time()
 for i in range(epoch):
     print("-------第 {} 轮训练开始-------".format(i+1))
@@ -88,14 +88,13 @@ for i in range(epoch):
             end_time = time.time()
             train_time = end_time - start_time
             print("Total train step: {}, Train time: {}, Loss: {}".format(total_train_step, train_time, loss.item()))
-            writer.add_scalar("Train_loss_step_local", loss.item(), total_train_step)
+            writer.add_scalar("Train_loss_step_local_1e3_2", loss.item(), total_train_step)
 
     # total train loss and acc
     print("Total train Loss: {}".format(total_train_loss))
     print("Total train accuracy: {}".format(total_train_accuracy/train_dataset_len))
-    writer.add_scalar("Train_loss_local", total_train_loss, i+1)
-    writer.add_scalar("Train_accuracy_local", total_train_accuracy/train_dataset_len, i+1)
-
+    writer.add_scalar("Train_loss_local_1e3_2", total_train_loss, total_val_step)
+    writer.add_scalar("Train_accuracy_local_1e3_2", total_train_accuracy/train_dataset_len, total_val_step)
     # validation step
     cnn1d_gap.eval()
     total_val_loss = 0  # loss and acc on validation set
@@ -114,8 +113,8 @@ for i in range(epoch):
 
     print("Total validation Loss: {}".format(total_val_loss))
     print("Total validation accuracy: {}".format(total_val_accuracy/val_dataset_len))
-    writer.add_scalar("Validation_loss_local", total_val_loss, total_val_step)
-    writer.add_scalar("Validation_accuracy_local", total_val_accuracy/val_dataset_len, total_val_step)
+    writer.add_scalar("Validation_loss_local_1e3_2", total_val_loss, total_val_step)
+    writer.add_scalar("Validation_accuracy_local_1e3_2", total_val_accuracy/val_dataset_len, total_val_step)
     total_val_step = total_val_step + 1
 
     # Early Stopping
