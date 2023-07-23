@@ -44,6 +44,9 @@ learning_rate = 1e-3
 # l2penalty = 1e-3
 # optimizer = torch.optim.Adam(fcn.parameters(), lr=learning_rate, weight_decay=l2penalty)  # add L2 regularization
 optimizer = torch.optim.Adam(fcn.parameters(), lr=learning_rate)
+
+# learning rate reduce
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=50, min_lr=0.0001)
 # Set up for some parameters in training
 total_train_step = 0   # 训练次数
 total_val_step = 0   # 测试次数
@@ -90,7 +93,7 @@ for i in range(epoch):
             train_time = end_time - start_time
             print("Total train step: {}, Train time: {}, Loss: {}".format(total_train_step, train_time, loss.item()))
             writer.add_scalar("Train_loss_step", loss.item(), total_train_step)
-
+    scheduler.step(total_train_loss)
     # total train loss and acc
     print("Total train Loss: {}".format(total_train_loss))
     print("Total train accuracy: {}".format(total_train_accuracy/train_dataset_len))
