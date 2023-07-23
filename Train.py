@@ -6,7 +6,8 @@ from torch import nn
 from ReadData import load_and_process_data, MyDataset
 # from Model.CNN1d import CNN1d
 # from Model.CNN1d_GAP import CNN1d_GAP
-from Model.FCN import FCN
+# from Model.FCN import FCN
+from Model.ResNet import ResNetBlock, ResNet
 import time
 
 # read data
@@ -32,9 +33,9 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
 # test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # networks model instantiation
-fcn = FCN()
+resnet = ResNet()
 if torch.cuda.is_available():
-    fcn = fcn.cuda()    # 转移到cuda上
+    resnet = resnet.cuda()    # 转移到cuda上
 # define loss function
 loss_fn = nn.CrossEntropyLoss()
 if torch.cuda.is_available():
@@ -42,20 +43,20 @@ if torch.cuda.is_available():
 # define optimizer
 learning_rate = 1e-3
 # l2penalty = 1e-3
-# optimizer = torch.optim.Adam(fcn.parameters(), lr=learning_rate, weight_decay=l2penalty)  # add L2 regularization
-optimizer = torch.optim.Adam(fcn.parameters(), lr=learning_rate)
+# optimizer = torch.optim.Adam(resnet.parameters(), lr=learning_rate, weight_decay=l2penalty)  # add L2 regularization
+optimizer = torch.optim.Adam(resnet.parameters(), lr=learning_rate)
 
 # learning rate reduce
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=50, min_lr=0.0001)
 # Set up for some parameters in training
 total_train_step = 0   # 训练次数
 total_val_step = 0   # 测试次数
-epoch = 2000     # 训练轮数
+epoch = 1500     # 训练轮数
 
 # early stopping
 best_val_loss = float('inf')
 patience_counter = 0
-patience_limit = 2000
+patience_limit = 1500
 
 # tensorboard
 writer = SummaryWriter("./Logs_tensorboard/FCN_1st")
@@ -63,7 +64,7 @@ start_time = time.time()
 for i in range(epoch):
     print("-------第 {} 轮训练开始-------".format(i+1))
     # training begin
-    fcn.train()   # turn to training mode
+    resnet.train()   # turn to training mode
     total_train_loss = 0
     total_train_accuracy = 0
     for data in train_loader:
@@ -71,7 +72,7 @@ for i in range(epoch):
         if torch.cuda.is_available():
             positions = positions.cuda()
             targets = targets.cuda()
-        outputs = fcn(positions)
+        outputs = resnet(positions)
         loss = loss_fn(outputs, targets)  # calculate loss
         total_train_loss = total_train_loss + loss.item()
         accuracy = (outputs.argmax(1) == targets).sum()
@@ -100,7 +101,7 @@ for i in range(epoch):
     writer.add_scalar("Train_loss", total_train_loss, total_val_step)
     writer.add_scalar("Train_accuracy", total_train_accuracy/train_dataset_len, total_val_step)
     # validation step
-    fcn.eval()
+    resnet.eval()
     total_val_loss = 0  # loss and acc on validation set
     total_val_accuracy = 0
     with torch.no_grad():   # No gradient accumulation for the validation part
@@ -109,7 +110,7 @@ for i in range(epoch):
             if torch.cuda.is_available():
                 positions = positions.cuda()
                 targets = targets.cuda()
-            outputs = fcn(positions)
+            outputs = resnet(positions)
             loss = loss_fn(outputs, targets)
             total_val_loss = total_val_loss + loss.item()
             accuracy = (outputs.argmax(1) == targets).sum()
