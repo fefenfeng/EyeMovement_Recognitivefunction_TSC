@@ -41,7 +41,7 @@ class ResNet(nn.Module):
         self.flatten = nn.Flatten()
         self.fc = nn.Linear(64, 2)
 
-    def forward(self,x):
+    def forward(self, x):
         x = self.block1(x)
         x = self.block2(x)
         x = self.block3(x)
