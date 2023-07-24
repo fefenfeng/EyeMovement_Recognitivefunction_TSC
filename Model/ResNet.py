@@ -5,18 +5,18 @@ from torch import nn
 class ResNetBlock(nn.Module):
     def __init__(self, in_channels, out_channels=64):
         super(ResNetBlock, self).__init__()
-        self.conv1 = nn.Conv1d(in_channels, out_channels, 7, 1, 3)
+        self.conv1 = nn.Conv1d(in_channels, out_channels, 7, 1, 3, bias=False)
         self.bn1 = nn.BatchNorm1d(out_channels)
         self.relu1 = nn.ReLU()
 
-        self.conv2 = nn.Conv1d(out_channels, out_channels, 5, 1, 2)
+        self.conv2 = nn.Conv1d(out_channels, out_channels, 5, 1, 2, bias=False)
         self.bn2 = nn.BatchNorm1d(out_channels)
         self.relu2 = nn.ReLU()
 
-        self.conv3 = nn.Conv1d(out_channels, out_channels, 3, 1, 1)
+        self.conv3 = nn.Conv1d(out_channels, out_channels, 3, 1, 1, bias=False)
         self.bn3 = nn.BatchNorm1d(out_channels)
 
-        self.shortcut = nn.Conv1d(in_channels, out_channels, 1)
+        self.shortcut = nn.Conv1d(in_channels, out_channels, 1, bias=False)
         self.bn_shortcut = nn.BatchNorm1d(out_channels)
         self.relu3 = nn.ReLU()
 

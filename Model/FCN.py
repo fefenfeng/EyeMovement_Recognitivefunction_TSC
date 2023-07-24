@@ -7,13 +7,13 @@ class FCN(nn.Module):
     def __init__(self):
         super(FCN, self).__init__()
         self.model = nn.Sequential(
-            nn.Conv1d(2, 128, kernel_size=7, stride=1, padding=3),
+            nn.Conv1d(2, 128, kernel_size=7, stride=1, padding=3, bias=False),
             nn.BatchNorm1d(128),
             nn.ReLU(),
-            nn.Conv1d(128, 256, 5, 1, 2),
+            nn.Conv1d(128, 256, 5, 1, 2, bias=False),
             nn.BatchNorm1d(256),
             nn.ReLU(),
-            nn.Conv1d(256, 128, 3, 1, 1),
+            nn.Conv1d(256, 128, 3, 1, 1, bias=False),
             nn.BatchNorm1d(128),
             nn.ReLU(),
             nn.AdaptiveAvgPool1d(1),
