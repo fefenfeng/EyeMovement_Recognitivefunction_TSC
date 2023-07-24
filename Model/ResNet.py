@@ -16,7 +16,7 @@ class ResNetBlock(nn.Module):
         self.conv3 = nn.Conv1d(out_channels, out_channels, 3, 1, 1, bias=False)
         self.bn3 = nn.BatchNorm1d(out_channels)
 
-        self.shortcut = nn.Conv1d(in_channels, out_channels, 1, bias=False)
+        self.shortcut = nn.Conv1d(in_channels, out_channels, 1)
         self.bn_shortcut = nn.BatchNorm1d(out_channels)
         self.relu3 = nn.ReLU()
 
