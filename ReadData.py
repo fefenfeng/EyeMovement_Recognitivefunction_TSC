@@ -73,8 +73,10 @@ class MyDataset(Dataset):
 
     # # data instance shape in dataset test
     # position, target = train_dataset[0]
+    # print(position)
     # print(position.shape)
     # print(target)
+    # print(target.shape)
 
     # # test if data has been standardisation
     # position, target = train_dataset[0]
