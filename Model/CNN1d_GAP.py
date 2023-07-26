@@ -1,6 +1,7 @@
-import torch
+# import torch
 from torch import nn
-from ReadData import *
+# from ReadData import *
+# from torch.utils.tensorboard import SummaryWriter
 
 
 class CNN1d_GAP(nn.Module):
@@ -34,10 +35,17 @@ class CNN1d_GAP(nn.Module):
         return x
 
 
-# # test if net works
+# test if net works
 # if __name__ == '__main__':
-#     # build instance
-#     cnn1d = CNN1d()
+#     writer = SummaryWriter("../Logs_tensorboard/Models_Structure_Graph/CNN1d_GAP")
+#     cnn1d_gap = CNN1d_GAP()
+#     input = torch.randn((16, 2, 33920))  # 16的batch size，2通道,len33920
+#
+#     writer.add_graph(cnn1d_gap, input)
+#     writer.close()
+
+    # # build instance
+    # cnn1d = CNN1d()
 #     print(cnn1d)
 #     # build dataset and dataloader
 #     train_data, val_data, test_data = load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"

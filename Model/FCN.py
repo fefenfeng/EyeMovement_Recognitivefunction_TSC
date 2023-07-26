@@ -1,6 +1,6 @@
 # import torch
 from torch import nn
-# from ReadData import *
+# from torch.utils.tensorboard import SummaryWriter
 
 
 class FCN(nn.Module):
@@ -29,11 +29,16 @@ class FCN(nn.Module):
 # test if net works
 # if __name__ == '__main__':
 #     # build instance
+#     writer = SummaryWriter("../Logs_tensorboard/Models_Structure_Graph/FCN")
 #     fcn = FCN()
-#     print(fcn)
+#     # print(fcn)
+#     #
+#     #
+#     # input = torch.ones((16, 2, 33920))  # 16的batch size，2通道,len33920
+#     # print(input.shape)
+#     # output = fcn(input)
+#     # print(output.shape)
+#     input = torch.randn((16, 2, 33920))  # 16的batch size，2通道,len33920
 #
-#
-    # input = torch.ones((16, 2, 33920))  # 16的batch size，2通道,len33920
-    # print(input.shape)
-    # output = fcn(input)
-    # print(output.shape)
+#     writer.add_graph(fcn, input)
+#     writer.close()

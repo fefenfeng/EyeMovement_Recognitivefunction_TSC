@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+# from torch.utils.tensorboard import SummaryWriter
 
 
 class ResNetBlock(nn.Module):
@@ -55,10 +56,16 @@ class ResNet(nn.Module):
 # # test if net works
 # if __name__ == '__main__':
 #     # build instance
+#     writer = SummaryWriter("../Logs_tensorboard/Models_Structure_Graph/Resnet")
 #     resnet = ResNet()
-#     print(resnet)
+#     # print(resnet)
+#     #
+#     # input = torch.ones((16, 2, 33920))  # 16的batch size，2通道,len33920
+#     # print(input.shape)
+#     # output = resnet(input)
+#     # print(output.shape)
 #
-#     input = torch.ones((16, 2, 33920))  # 16的batch size，2通道,len33920
-#     print(input.shape)
-#     output = resnet(input)
-#     print(output.shape)
+#     input = torch.randn((16, 2, 33920))  # 16的batch size，2通道,len33920
+#
+#     writer.add_graph(resnet, input)
+#     writer.close()

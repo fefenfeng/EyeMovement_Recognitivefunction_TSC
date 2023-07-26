@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from ReadData import *
+from torch.utils.tensorboard import SummaryWriter
 
 
 class CNN1d(nn.Module):
@@ -37,8 +38,14 @@ class CNN1d(nn.Module):
         return x
 
 
-# # test if net works
-# if __name__ == '__main__':
+# test if net works
+if __name__ == '__main__':
+    writer = SummaryWriter("../Logs_tensorboard/Models_Structure_Graph/CNN1d")
+    cnn1d = CNN1d()
+    input = torch.randn((16, 2, 33920))  # 16的batch size，2通道,len33920
+
+    writer.add_graph(cnn1d, input)
+    writer.close()
 #     # build instance
 #     cnn1d = CNN1d()
 #     print(cnn1d)

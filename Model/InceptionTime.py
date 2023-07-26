@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+# from torch.utils.tensorboard import SummaryWriter
 
 
 # no bottleneck transfer original data
@@ -136,13 +137,17 @@ class InceptionTime(nn.Module):
         return x
 
 
-# # test if net works
+# test if net works
 # if __name__ == '__main__':
 #     # build instance
+#     writer = SummaryWriter("../Logs_tensorboard/Models_Structure_Graph/InceptionTime")
 #     inceptiontime = InceptionTime()
-#     print(inceptiontime)
+#     # print(inceptiontime)
 #
-#     input = torch.ones((16, 2, 33920))  # 16的batch size，2通道,len33920
-#     print(input.shape)
-#     output = inceptiontime(input)
-#     print(output.shape)
+#     input = torch.randn((16, 2, 33920))  # 16的batch size，2通道,len33920
+#     # print(input.shape)
+#     # output = inceptiontime(input)
+#     # print(output.shape)
+#
+#     writer.add_graph(inceptiontime, input)
+#     writer.close()
