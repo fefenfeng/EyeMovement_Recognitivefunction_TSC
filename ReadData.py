@@ -1,9 +1,10 @@
 import os
 import pandas as pd
 import torch
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import StandardScaler
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
+# from torch.utils.data import DataLoader
 # from torch.utils.tensorboard import SummaryWriter
 
 
@@ -36,6 +37,31 @@ def load_and_process_data(path):
     return train_set, val_set, test_set
 
 
+def cross_val_load_data(path):
+    # Load data
+    data = {}       # new dic to load data
+    for label in ['0', '1']:
+        data[label] = []
+        dir_path = os.path.join(path, label)    # sample folders full path
+        for file_name in os.listdir(dir_path):
+            file_path = os.path.join(dir_path, file_name)   # full file path
+            df = pd.read_csv(file_path)     # csv-->dataframe
+            data[label].append(df.values)   # dataframe value, which is supposed to be np.array two-dimensional
+
+    # Standardize data
+    scaler = StandardScaler()
+    for label in data:
+        for i in range(len(data[label])):
+            data[label][i] = scaler.fit_transform(data[label][i])   # Standardise each data for each class
+
+    # k-fold split
+    kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+    data_all = data['0'] + data['1']
+    labels_all = ['0'] * len(data['0']) + ['1'] * len(data['1'])
+
+    return data_all, labels_all, kfold
+
+
 class MyDataset(Dataset):
     def __init__(self, data):
         self.data = data
@@ -57,6 +83,7 @@ class MyDataset(Dataset):
 #     train_dataset = MyDataset(train_data)
 #     val_dataset = MyDataset(val_data)
 #     test_dataset = MyDataset(test_data)
+
 #     # build dataloader
 #     batch_size = 32
 #     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
