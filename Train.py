@@ -39,10 +39,12 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
 fcn = FCN()
 if torch.cuda.is_available():
     fcn = fcn.cuda()    # 转移到cuda上
+
 # define loss function
 loss_fn = nn.CrossEntropyLoss()
 if torch.cuda.is_available():
     loss_fn = loss_fn.cuda()
+
 # define optimizer
 learning_rate = 1e-3
 # l2penalty = 1e-3
@@ -51,6 +53,7 @@ optimizer = torch.optim.Adam(fcn.parameters(), lr=learning_rate)
 
 # learning rate reduce
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=50, min_lr=0.0001)
+
 # Set up for some parameters in training
 total_train_step = 0   # 训练次数
 total_val_step = 0   # 测试次数
@@ -58,12 +61,14 @@ epoch = 1500     # 训练轮数
 
 # early stopping
 best_val_loss = float('inf')
+best_val_acc = float('inf')
 patience_counter = 0
-patience_limit = 1500
+patience_limit = 50
 
 # tensorboard
 writer = SummaryWriter("./Logs_tensorboard/FCN_1st")
 start_time = time.time()
+
 for i in range(epoch):
     print("-------第 {} 轮训练开始-------".format(i+1))
     # training begin
@@ -75,38 +80,39 @@ for i in range(epoch):
         if torch.cuda.is_available():
             positions = positions.cuda()
             targets = targets.cuda()
+
         outputs = fcn(positions)
         loss = loss_fn(outputs, targets)  # calculate loss
         total_train_loss = total_train_loss + loss.item()
         accuracy = (outputs.argmax(1) == targets).sum()
         total_train_accuracy = total_train_accuracy + accuracy
+
         optimizer.zero_grad()   # turn optimizer gradient--> zero
         loss.backward()     # backward propagation
-        # if hasattr(torch.cuda, 'empty_cache'):    # to avoid cuda out of memory
-        #     torch.cuda.empty_cache()
-        #     print("empty_cache")
         optimizer.step()    # Step gradient update
-        # if hasattr(torch.cuda, 'empty_cache'):
-        #     torch.cuda.empty_cache()
-        #     print("empty_cache")
 
         total_train_step = total_train_step + 1
+
         # train loss step
         if total_train_step % 50 == 0:
             end_time = time.time()
             train_time = end_time - start_time
             print("Total train step: {}, Train time: {}, Loss: {}".format(total_train_step, train_time, loss.item()))
             writer.add_scalar("Train_loss_step", loss.item(), total_train_step)
+
     scheduler.step(total_train_loss)
+
     # total train loss and acc
     print("Total train Loss: {}".format(total_train_loss))
     print("Total train accuracy: {}".format(total_train_accuracy/train_dataset_len))
     writer.add_scalar("Train_loss", total_train_loss, total_val_step)
     writer.add_scalar("Train_accuracy", total_train_accuracy/train_dataset_len, total_val_step)
+
     # validation step
     fcn.eval()
     total_val_loss = 0  # loss and acc on validation set
     total_val_accuracy = 0
+
     with torch.no_grad():   # No gradient accumulation for the validation part
         for data in val_loader:
             positions, targets = data
@@ -128,10 +134,15 @@ for i in range(epoch):
     # Early Stopping
     if total_val_loss < best_val_loss:
         best_val_loss = total_val_loss
+        best_val_acc = total_val_accuracy / val_dataset_len
+        torch.save(fcn.state_dict(), "./State_dict/FCN_State/Fine_tuning/.pth")
         patience_counter = 0
     else:
         patience_counter += 1
         if patience_counter >= patience_limit:
             print("val_loss has not improved for {} consecutive epoch, early stop at {} round".format(patience_limit, total_val_step))
             break
+
+writer.add_scalar("Best_val_loss", best_val_loss, 1)
+writer.add_scalar("Best_val_acc", best_val_acc, 1)
 writer.close()
