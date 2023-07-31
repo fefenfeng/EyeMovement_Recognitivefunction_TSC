@@ -21,7 +21,7 @@ class ResNetBlock(nn.Module):
         self.bn_shortcut = nn.BatchNorm1d(out_channels)
         self.relu3 = nn.ReLU()
 
-    def forward(self,x):
+    def forward(self, x):
         shortcut = self.bn_shortcut(self.shortcut(x))
 
         x = self.relu1(self.bn1(self.conv1(x)))
