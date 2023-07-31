@@ -46,18 +46,29 @@ batch_size = 16
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
 
-data_iter = iter(train_loader)
-first_batch = next(data_iter)   # first batch in loader
-datas, labels = first_batch
-data = datas[0:1]       # first data in first batch
-label = labels[0:1]
-# print(label)
-label = label.item()
-print(label)
-# label = 0
+fcn_cam = FCN_CAM()     # build model
 
-fcn_cam = FCN_CAM()
-output = fcn_cam(data)  # forward pass through the new model
+desired_label = 1  # the class i want
+# iterate over all batches in the data loader
+for datas, labels in train_loader:
+    # iterate over all samples in the batch
+    for i in range(len(datas)):
+        data = datas[i:i+1]  # get the i-th data in the batch
+        label = labels[i]    # get the i-th label in the batch
+        output = fcn_cam(data)     # forward pass through the new model
+
+        # check if the prediction matches the label
+        if output.argmax(1).item() == label.item() == desired_label:
+            label = label.item()
+            break
+    else:
+        # this only executes if the inner loop completed without finding a match
+        continue
+    # this only executes if the inner loop was exited by 'break'
+    break
+
+print(data)
+print(label, output.argmax(1).item())
 
 weights = fcn_cam.fc.weight.detach()    # get the weights of the last linear layer
 weights = weights.transpose(0, 1)  # change the shape of weights from (2, num_channels) to (num_channels, 2)
@@ -65,11 +76,17 @@ weights = weights.transpose(0, 1)  # change the shape of weights from (2, num_ch
 # calculate cam, channels weighted sum of feature maps
 cam = torch.einsum('ijk,jl->ilk', fcn_cam.feature_map, weights)
 
-# Apply a ReLu activation
-cam = nn.functional.relu(cam)
+# # Apply a ReLu activation
+# cam = nn.functional.relu(cam)
 
-# Normalize the CAM to range[0,1]
-cam = (cam - cam.min()) / (cam.max() - cam.min())
+# Percentile normalization
+lower, upper = np.percentile(cam, [50, 99])
+cam = np.clip(cam, lower, upper)  # clip values outside of the lower and upper percentile
+cam = (cam - lower) / (upper - lower)  # scale the values to range [0,1]
+
+
+# # Normalize the CAM to range[0,1]
+# cam = (cam - cam.min()) / (cam.max() - cam.min())
 
 # Create a colormap
 cmap = plt.get_cmap('jet')
@@ -78,33 +95,33 @@ cmap = plt.get_cmap('jet')
 data = data.squeeze(0)
 cam = cam.squeeze(0)
 
-# plot the data
-fig, ax = plt.subplots(figsize=(10, 6))
-# Create an array of colors based on the CAM for the given label
-colors = cmap(cam[label])
-
-# Plot the data with the colors
-for channel in range(data.shape[0]):
-    for i in range(data.shape[1]-1):
-        ax.plot(range(i, i+2), data[channel, i:i+2], color=colors[i])
-
-plt.show()
-
-
-# # plot the data
-# fig, axs = plt.subplots(data.shape[0], 1, figsize=(10, 6))
-#
+# # plot the data in one plot
+# fig, ax = plt.subplots(figsize=(10, 6))
 # # Create an array of colors based on the CAM for the given label
 # colors = cmap(cam[label])
-#
-# channel_names = ['abs_x', 'abs_y']
 #
 # # Plot the data with the colors
 # for channel in range(data.shape[0]):
 #     for i in range(data.shape[1]-1):
-#         axs[channel].plot(range(i, i+2), data[channel, i:i+2], color=colors[i])
-#     axs[channel].set_title(channel_names[channel])
+#         ax.plot(range(i, i+2), data[channel, i:i+2], color=colors[i])
 #
-# plt.tight_layout()
 # plt.show()
+
+
+# plot the data in two subplots
+fig, axs = plt.subplots(data.shape[0], 1, figsize=(10, 6))
+
+# Create an array of colors based on the CAM for the given label
+colors = cmap(cam[label])
+
+channel_names = ['abs_x', 'abs_y']
+
+# Plot the data with the colors
+for channel in range(data.shape[0]):
+    for i in range(data.shape[1]-1):
+        axs[channel].plot(range(i, i+2), data[channel, i:i+2], color=colors[i])
+    axs[channel].set_title(channel_names[channel])
+
+plt.tight_layout()
+plt.show()
 
