@@ -19,12 +19,12 @@ class CNN1d_GAP(nn.Module):
             nn.MaxPool1d(4),
             nn.Conv1d(128, 256, 3, 1, 1),
             nn.ReLU(),
-            nn.MaxPool1d(2),
+            nn.MaxPool1d(4),
             nn.AdaptiveAvgPool1d(1),
             nn.Flatten(),
             nn.Linear(256, 64),
-            nn.Dropout(p=0.2),
-            nn.Linear(64, 10),
+            # nn.Dropout(p=0.2),
+            nn.Linear(64, 2),
         )
 
     def forward(self, x):
