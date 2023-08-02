@@ -10,23 +10,23 @@ class CNN1d(nn.Module):
         self.model = nn.Sequential(
             nn.Conv1d(2, 32, kernel_size=7, stride=1, padding=3),
             nn.ReLU(),
-            nn.MaxPool1d(kernel_size=4),
+            nn.MaxPool1d(kernel_size=4),  # 33920/4 = 8480
             nn.Conv1d(32, 64, 5, 1, 2),
             nn.ReLU(),
-            nn.MaxPool1d(4),
+            nn.MaxPool1d(4),        # 2120
             nn.Conv1d(64, 128, 5, 1, 2),
             nn.ReLU(),
-            nn.MaxPool1d(4),
+            nn.MaxPool1d(4),        # 530
             nn.Conv1d(128, 256, 3, 1, 1),
             nn.ReLU(),
-            nn.MaxPool1d(4),
+            nn.MaxPool1d(4, padding=1),     #
             nn.Flatten(),
-            nn.Linear(265*256, 4240),
-            nn.Dropout(p=0.2),
+            nn.Linear(133*256, 4240),
+            # nn.Dropout(p=0.2),
             nn.Linear(4240, 256),
-            nn.Dropout(p=0.2),  # dropout regularization
+            # nn.Dropout(p=0.2),  # dropout regularization
             nn.Linear(256, 64),
-            nn.Dropout(p=0.2),
+            # nn.Dropout(p=0.2),
             nn.Linear(64, 2),
         )
 
