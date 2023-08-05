@@ -1,9 +1,10 @@
 import os
 import pandas as pd
 import torch
-from sklearn.model_selection import train_test_split, KFold
+from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import Dataset
+# from torch.utils.data import Subset
 # from torch.utils.data import DataLoader
 # from torch.utils.tensorboard import SummaryWriter
 
@@ -54,12 +55,12 @@ def cross_val_load_data(path):
         for i in range(len(data[label])):
             data[label][i] = scaler.fit_transform(data[label][i])   # Standardise each data for each class
 
-    # k-fold split
-    kfold = KFold(n_splits=5, shuffle=True, random_state=42)
     data_all = data['0'] + data['1']
     labels_all = ['0'] * len(data['0']) + ['1'] * len(data['1'])
 
-    return data_all, labels_all, kfold
+    # k-fold split
+    stratified_kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    return data_all, labels_all, stratified_kfold
 
 
 class MyDataset(Dataset):
@@ -76,6 +77,7 @@ class MyDataset(Dataset):
 
 
 # if __name__ == '__main__':
+
 #     # load data
 #     train_data, val_data, test_data = load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"
 #                                                             r"\data_info\trial1_sorted")

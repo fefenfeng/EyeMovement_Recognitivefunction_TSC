@@ -15,13 +15,13 @@ from Model.FCN import FCN
 
 
 # read data
-data_all, labels_all, kfold = cross_val_load_data(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial1_sorted")
+data_all, labels_all, stratified_kfold = cross_val_load_data(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial1_sorted")
 
 # to store best val acc and loss per fold
 val_best_loss_5fold = []
 val_best_acc_5fold = []
 
-for fold, (train_ids, val_ids) in enumerate(kfold.split(data_all)):
+for fold, (train_ids, val_ids) in enumerate(stratified_kfold.split(data_all, labels_all)):
     print("-------Fold {} begins!!!-------".format(fold + 1))
     # create sub dataset
     train_dataset = Subset(MyDataset(list(zip(data_all, labels_all))), train_ids)
