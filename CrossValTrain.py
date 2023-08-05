@@ -156,17 +156,24 @@ for fold, (train_ids, val_ids) in enumerate(stratified_kfold.split(data_all, lab
         torch.cuda.empty_cache()
 
 writer = SummaryWriter("./Logs_tensorboard/FCN_5folds_1st/Average")
-avg_val_loss = sum(val_best_loss_5fold) / len(val_best_loss_5fold)
-avg_val_acc = sum(val_best_acc_5fold) / len(val_best_acc_5fold)
-std_val_loss = std(val_best_loss_5fold)
-std_val_acc = std(val_best_acc_5fold)
-
 for i, value in enumerate(val_best_acc_5fold):
     writer.add_scalar("Val_Best_Acc_5fold", value, i)
 for i, value in enumerate(val_best_loss_5fold):
     writer.add_scalar("val_best_loss_5fold", value, i)
+
+
+avg_val_loss = sum(val_best_loss_5fold) / len(val_best_loss_5fold)
+avg_val_acc = sum(val_best_acc_5fold) / len(val_best_acc_5fold)
+
 writer.add_scalar("Mean_val_best_loss", avg_val_loss, 1)
 writer.add_scalar("Mean_val_best_accuracy", avg_val_acc, 1)
+
+val_best_loss_5fold = [val.item() if torch.is_tensor(val) else val for val in val_best_loss_5fold]
+val_best_acc_5fold = [val.item() if torch.is_tensor(val) else val for val in val_best_acc_5fold]
+
+std_val_loss = std(val_best_loss_5fold)
+std_val_acc = std(val_best_acc_5fold)
+
 writer.add_scalar("Std_val_best_loss", std_val_loss, 1)
 writer.add_scalar("Std_val_best_accuracy", std_val_acc, 1)
 writer.close()
