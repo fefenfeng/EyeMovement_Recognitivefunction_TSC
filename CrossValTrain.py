@@ -65,6 +65,7 @@ for fold, (train_ids, val_ids) in enumerate(stratified_kfold.split(data_all, lab
     # early stopping
     best_val_loss = float('inf')
     best_val_acc = float('inf')
+    best_loss_at_current_best_acc = float('inf')
     patience_counter = 0
     patience_limit = 50
 
@@ -135,21 +136,38 @@ for fold, (train_ids, val_ids) in enumerate(stratified_kfold.split(data_all, lab
         writer.add_scalar("Validation_accuracy", total_val_accuracy / val_dataset_len, total_val_step)
         total_val_step = total_val_step + 1
 
-        # Early Stopping
+        # Early Stopping and update best_val_loss
         if total_val_loss < best_val_loss:
             best_val_loss = total_val_loss
-            best_val_acc = total_val_accuracy / val_dataset_len
-            torch.save(fcn.state_dict(), f"./State_dict/FCN_State/5fold_1st/Fold_{fold + 1}.pth")
+            # best_val_acc = total_val_accuracy / val_dataset_len
+            # torch.save(fcn.state_dict(), f"./State_dict/FCN_State/5fold_1st/Fold_{fold + 1}.pth")
             patience_counter = 0
         else:
             patience_counter += 1
-            if patience_counter >= patience_limit:
-                print(
-                    "val_loss has not improved for {} consecutive epoch, early stop at {} round".format(patience_limit,
-                                                                                                        total_val_step))
-                val_best_loss_5fold.append(best_val_loss)
-                val_best_acc_5fold.append(best_val_acc)
-                break
+            # if patience_counter >= patience_limit:
+            #     print("val_loss has not improved for {} consecutive epoch, early stop at {} round".format(patience_limit, total_val_step))
+            #     break
+
+        # update best_val_acc
+        current_val_acc = total_val_accuracy / val_dataset_len
+        should_save_checkpoint = False  # save or not
+        if current_val_acc > best_val_acc:
+            best_val_acc = current_val_acc
+            best_loss_at_current_best_acc = total_val_loss  # best loss at this best acc
+            should_save_checkpoint = True
+        elif current_val_acc == best_val_acc and total_val_loss < best_loss_at_current_best_acc:
+            best_loss_at_current_best_acc = total_val_loss
+            should_save_checkpoint = True
+        # checkpoint, save the best model state
+        if should_save_checkpoint:
+            torch.save(fcn.state_dict(), f"./State_dict/FCN_State/5fold_1st/Fold_{fold + 1}.pth")
+
+        if patience_counter >= patience_limit:
+            print("val_loss has not improved for {} consecutive epoch, early stop at {} round".format(patience_limit, total_val_step))
+            break
+
+    val_best_loss_5fold.append(best_val_loss)
+    val_best_acc_5fold.append(best_val_acc)
     writer.close()
     del fcn
     if torch.cuda.is_available():

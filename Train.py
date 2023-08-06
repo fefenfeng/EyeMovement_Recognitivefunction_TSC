@@ -62,6 +62,7 @@ epoch = 1500     # 训练轮数
 # early stopping
 best_val_loss = float('inf')
 best_val_acc = float('inf')
+best_loss_at_current_best_acc = float('inf')
 patience_counter = 0
 patience_limit = 50
 
@@ -134,14 +135,32 @@ for i in range(epoch):
     # Early Stopping
     if total_val_loss < best_val_loss:
         best_val_loss = total_val_loss
-        best_val_acc = total_val_accuracy / val_dataset_len
-        torch.save(fcn.state_dict(), "./State_dict/FCN_State/Fine_tuning/.pth")
+        # best_val_acc = total_val_accuracy / val_dataset_len
+        # torch.save(fcn.state_dict(), "./State_dict/FCN_State/Fine_tuning/.pth")
         patience_counter = 0
     else:
         patience_counter += 1
-        if patience_counter >= patience_limit:
-            print("val_loss has not improved for {} consecutive epoch, early stop at {} round".format(patience_limit, total_val_step))
-            break
+        # if patience_counter >= patience_limit:
+        #     print("val_loss has not improved for {} consecutive epoch, early stop at {} round".format(patience_limit, total_val_step))
+        #     break
+    # update best_val_acc
+    current_val_acc = total_val_accuracy / val_dataset_len
+    should_save_checkpoint = False  # save or not
+    if current_val_acc > best_val_acc:
+        best_val_acc = current_val_acc
+        best_loss_at_current_best_acc = total_val_loss  # best loss at this best acc
+        should_save_checkpoint = True
+    elif current_val_acc == best_val_acc and total_val_loss < best_loss_at_current_best_acc:
+        best_loss_at_current_best_acc = total_val_loss
+        should_save_checkpoint = True
+    # checkpoint, save the best model state
+    if should_save_checkpoint:
+        torch.save(fcn.state_dict(), "./State_dict/FCN_State/Fine_tuning/.pth")
+
+    if patience_counter >= patience_limit:
+        print("val_loss has not improved for {} consecutive epoch, early stop at {} round".format(patience_limit,
+                                                                                                  total_val_step))
+        break
 
 writer.add_scalar("Best_val_loss", best_val_loss, 1)
 writer.add_scalar("Best_val_acc", best_val_acc, 1)

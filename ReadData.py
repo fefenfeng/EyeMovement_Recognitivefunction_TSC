@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import Dataset
 # from torch.utils.data import Subset
-# from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader
 # from torch.utils.tensorboard import SummaryWriter
 
 
@@ -63,6 +63,43 @@ def cross_val_load_data(path):
     return data_all, labels_all, stratified_kfold
 
 
+def modified_load_and_process_data(path):
+    # Load data
+    participants_data = {}  # Dict to group data by participant
+
+    for label in ['0', '1']:
+        dir_path = os.path.join(path, label)
+        for file_name in os.listdir(dir_path):
+            participant_id = file_name.split('_')[0]
+            file_path = os.path.join(dir_path, file_name)
+            df = pd.read_csv(file_path)
+
+            # Standardize data
+            scaler = StandardScaler()
+            standardized_data = scaler.fit_transform(df.values)
+
+            # Add to the participant's data
+            if participant_id not in participants_data:
+                participants_data[participant_id] = []
+            participants_data[participant_id].append((standardized_data, label))
+
+    # Split by participant into train, val, test
+    train_set, val_set, test_set = [], [], []
+
+    participant_ids = list(participants_data.keys())
+    train_ids, temp_ids = train_test_split(participant_ids, test_size=0.3, random_state=10)
+    val_ids, test_ids = train_test_split(temp_ids, test_size=0.5, random_state=10)
+
+    for pid in train_ids:
+        train_set.extend(participants_data[pid])
+    for pid in val_ids:
+        val_set.extend(participants_data[pid])
+    for pid in test_ids:
+        test_set.extend(participants_data[pid])
+
+    return train_set, val_set, test_set
+
+
 class MyDataset(Dataset):
     def __init__(self, data):
         self.data = data
@@ -76,29 +113,29 @@ class MyDataset(Dataset):
         return len(self.data)
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
-#     # load data
-#     train_data, val_data, test_data = load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"
-#                                                             r"\data_info\trial1_sorted")
-#     # dataset instantiation
-#     train_dataset = MyDataset(train_data)
-#     val_dataset = MyDataset(val_data)
-#     test_dataset = MyDataset(test_data)
+    # load data
+    train_data, val_data, test_data = modified_load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"
+                                                            r"\data_info\trial1_sorted")
+    # dataset instantiation
+    train_dataset = MyDataset(train_data)
+    val_dataset = MyDataset(val_data)
+    test_dataset = MyDataset(test_data)
 
-#     # build dataloader
-#     batch_size = 32
-#     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-#     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
-#     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
+    # build dataloader
+    batch_size = 16
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
-    # # test dataset.__len__
-    # train_dataset_len = len(train_dataset)
-    # print("length of train dataset is :{}".format(train_dataset_len))
-    # val_dataset_len = len(val_dataset)
-    # print("length of validation dataset is :{}".format(val_dataset_len))
-    # test_dataset_len = len(test_dataset)
-    # print("length of train dataset is :{}".format(test_dataset_len))
+    # test dataset.__len__
+    train_dataset_len = len(train_dataset)
+    print("length of train dataset is :{}".format(train_dataset_len))
+    val_dataset_len = len(val_dataset)
+    print("length of validation dataset is :{}".format(val_dataset_len))
+    test_dataset_len = len(test_dataset)
+    print("length of train dataset is :{}".format(test_dataset_len))
 
     # # data instance shape in dataset test
     # position, target = train_dataset[0]
@@ -115,7 +152,7 @@ class MyDataset(Dataset):
     # print("Standard deviation: ", std)
 
     # # test data instance in dataloader
-    # for sample in train_loader:
+    # for sample in val_loader:
     #     positions, targets = sample
     #     print(positions.shape)
     #     print(targets)
