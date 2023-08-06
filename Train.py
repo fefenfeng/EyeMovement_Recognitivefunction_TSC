@@ -61,7 +61,7 @@ epoch = 1500     # 训练轮数
 
 # early stopping
 best_val_loss = float('inf')
-best_val_acc = float('inf')
+best_val_acc = float('-inf')
 best_loss_at_current_best_acc = float('inf')
 patience_counter = 0
 patience_limit = 50
