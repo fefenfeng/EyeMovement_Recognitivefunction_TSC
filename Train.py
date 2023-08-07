@@ -4,14 +4,24 @@ import time
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from torch import nn
-from ReadData import load_and_process_data, MyDataset
-
+from ReadData import MyDataset
+from ReadData import load_and_process_data
+# from ReadData import modified_load_and_process_data
 # from Model.CNN1d import CNN1d
 # from Model.CNN1d_GAP import CNN1d_GAP
 from Model.FCN import FCN
 # from Model.ResNet import ResNet
 # from Model.InceptionTime import InceptionTime
 
+
+# # modified_load_data
+# # read data
+# train_data, val_data, train_ids, val_ids = modified_load_and_process_data("/content/drive/MyDrive/trial1_sorted")
+#
+# print("Number of participants in dataset are :{}".format(len(train_ids)))
+# print("Number of participants in dataset are :{}".format(len(val_ids)))
+# print(train_ids)
+# print(val_ids)
 
 # read data
 train_data, val_data, test_data = load_and_process_data(r"D:\MyFiles\UOB_Robotics22\Dissertation"
