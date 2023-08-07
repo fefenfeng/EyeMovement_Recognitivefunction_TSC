@@ -4,7 +4,9 @@ import time
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader, Subset
 from torch import nn
-from ReadData import cross_val_load_data, MyDataset
+from ReadData import MyDataset
+from ReadData import cross_val_load_data
+from ReadData import modified_cross_val_load_data
 from numpy import std
 
 # from Model.CNN1d import CNN1d
@@ -14,18 +16,37 @@ from Model.FCN import FCN
 # from Model.InceptionTime import InceptionTime
 
 
-# read data
-data_all, labels_all, stratified_kfold = cross_val_load_data(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial1_sorted")
+# # read data
+# data_all, labels_all, stratified_kfold = cross_val_load_data(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial1_sorted")
+
+# read data(modified)
+participants_data, participant_ids, stratify_labels, stratified_kfold = modified_cross_val_load_data(
+    r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial1_sorted")
 
 # to store best val acc and loss per fold
 val_best_loss_5fold = []
 val_best_acc_5fold = []
 
-for fold, (train_ids, val_ids) in enumerate(stratified_kfold.split(data_all, labels_all)):
+# modified cross_val_load
+for fold, (train_pids_idx, val_pids_idx) in enumerate(stratified_kfold.split(participant_ids, stratify_labels)):
     print("-------Fold {} begins!!!-------".format(fold + 1))
-    # create sub dataset
-    train_dataset = Subset(MyDataset(list(zip(data_all, labels_all))), train_ids)
-    val_dataset = Subset(MyDataset(list(zip(data_all, labels_all))), val_ids)
+
+    # Get the actual data for these participant IDs
+    train_data = [data for pid_idx in train_pids_idx for data in participants_data[participant_ids[pid_idx]]]
+    val_data = [data for pid_idx in val_pids_idx for data in participants_data[participant_ids[pid_idx]]]
+
+    # # Print the participant IDs for train and validation set
+    # print("Train Participant IDs:", [participant_ids[pid_idx] for pid_idx in train_pids_idx])
+    # print("Validation Participant IDs:", [participant_ids[pid_idx] for pid_idx in val_pids_idx])
+
+    # Create sub dataset
+    train_dataset = MyDataset(train_data)
+    val_dataset = MyDataset(val_data)
+# for fold, (train_ids, val_ids) in enumerate(stratified_kfold.split(data_all, labels_all)):
+#     print("-------Fold {} begins!!!-------".format(fold + 1))
+#     # create sub dataset
+#     train_dataset = Subset(MyDataset(list(zip(data_all, labels_all))), train_ids)
+#     val_dataset = Subset(MyDataset(list(zip(data_all, labels_all))), val_ids)
 
     # dataset length
     train_dataset_len = len(train_dataset)
