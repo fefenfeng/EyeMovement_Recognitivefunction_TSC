@@ -3,11 +3,11 @@ import shutil
 
 # split whole data folder into 2 trials
 
-folder_path = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\eye_centre_labels\left_eye"
-folder_0 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial0\0"
-folder_1 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial1\0"
-folder_2 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial0\1"
-folder_3 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial1\1"
+folder_path = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\eye_centre_dataset_inc_blinks\right_eye"
+folder_0 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\right_eye\trial0\0"
+folder_1 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\right_eye\trial1\0"
+folder_2 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\right_eye\trial0\1"
+folder_3 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\right_eye\trial1\1"
 
 # 将文件夹路径放入列表中
 folders = [folder_0, folder_1, folder_2, folder_3]

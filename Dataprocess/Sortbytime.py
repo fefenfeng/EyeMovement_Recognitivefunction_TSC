@@ -21,20 +21,22 @@ def process_files(source_dir, target_dir):
         #
         # # 将sequence列转换为整数类型
         # df['sequence'] = df['sequence'].astype(int)
-        # 从filename列中提取数字并转换为整数类型
-        df['sequence'] = df['filename'].str.extract('-(\d+)\.jpg')[0].astype(int)
+        # # 从filename列中提取数字并转换为整数类型
+        # df['sequence'] = df['filename'].str.extract('-(\d+)\.jpg')[0].astype(int)
+        #
+        # # 根据序列号重新排序
+        # df = df.sort_values('sequence')
 
-        # 根据序列号重新排序
-        df = df.sort_values('sequence')
+        # # 删除filename、Unnamed: 0列和新添加的sequence列
+        # df = df.drop(['Unnamed: 0', 'filename', 'sequence'], axis=1)
 
-        # 删除filename、Unnamed: 0列和新添加的sequence列
-        df = df.drop(['Unnamed: 0', 'filename', 'sequence'], axis=1)
+        df = df.drop(['Unnamed: 0', 'filename', 'blink'], axis=1)
 
         # 将处理后的数据保存到目标文件夹
         df.to_csv(os.path.join(target_dir, file), index=False)
 
 
 # 调用函数，传入源文件夹路径和目标文件夹路径
-source_dir = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial1\1"
-target_dir = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial1_sorted\1"
+source_dir = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\left_eye\trial1\0"
+target_dir = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\left_eye\trial1_sorted\0"
 process_files(source_dir, target_dir)
