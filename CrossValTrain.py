@@ -26,6 +26,7 @@ participants_data, participant_ids, stratify_labels, stratified_kfold = modified
 # to store best val acc and loss per fold
 val_best_loss_5fold = []
 val_best_acc_5fold = []
+val_best_acc_at_best_loss_5fold = []
 
 # modified cross_val_load
 for fold, (train_pids_idx, val_pids_idx) in enumerate(stratified_kfold.split(participant_ids, stratify_labels)):
@@ -86,6 +87,7 @@ for fold, (train_pids_idx, val_pids_idx) in enumerate(stratified_kfold.split(par
     # early stopping
     best_val_loss = float('inf')
     best_val_acc = float('-inf')
+    best_val_acc_at_best_loss = float('-inf')
     best_loss_at_current_best_acc = float('inf')
     patience_counter = 0
     patience_limit = 50
@@ -160,6 +162,7 @@ for fold, (train_pids_idx, val_pids_idx) in enumerate(stratified_kfold.split(par
         # Early Stopping and update best_val_loss
         if total_val_loss < best_val_loss:
             best_val_loss = total_val_loss
+            best_val_acc_at_best_loss = total_val_accuracy / val_dataset_len
             # best_val_acc = total_val_accuracy / val_dataset_len
             # torch.save(fcn.state_dict(), f"./State_dict/FCN_State/5fold_1st/Fold_{fold + 1}.pth")
             patience_counter = 0
@@ -189,6 +192,7 @@ for fold, (train_pids_idx, val_pids_idx) in enumerate(stratified_kfold.split(par
 
     val_best_loss_5fold.append(best_val_loss)
     val_best_acc_5fold.append(best_val_acc)
+    val_best_acc_at_best_loss_5fold.append(best_val_acc_at_best_loss)
     writer.close()
     del fcn
     if torch.cuda.is_available():
@@ -199,20 +203,27 @@ for i, value in enumerate(val_best_acc_5fold):
     writer.add_scalar("Val_Best_Acc_5fold", value, i)
 for i, value in enumerate(val_best_loss_5fold):
     writer.add_scalar("val_best_loss_5fold", value, i)
+for i, value in enumerate(val_best_acc_at_best_loss_5fold):
+    writer.add_scalar("val_best_loss_5fold", value, i)
 
 
 avg_val_loss = sum(val_best_loss_5fold) / len(val_best_loss_5fold)
 avg_val_acc = sum(val_best_acc_5fold) / len(val_best_acc_5fold)
+avg_val_acc_at_best_loss = sum(val_best_acc_at_best_loss_5fold) / len(val_best_acc_at_best_loss_5fold)
 
 writer.add_scalar("Mean_val_best_loss", avg_val_loss, 1)
 writer.add_scalar("Mean_val_best_accuracy", avg_val_acc, 1)
+writer.add_scalar("Mean_val_best_accuracy_at_best_loss", avg_val_acc_at_best_loss, 1)
 
 val_best_loss_5fold = [val.item() if torch.is_tensor(val) else val for val in val_best_loss_5fold]
 val_best_acc_5fold = [val.item() if torch.is_tensor(val) else val for val in val_best_acc_5fold]
+val_best_acc_at_best_loss_5fold = [val.item() if torch.is_tensor(val) else val for val in val_best_acc_at_best_loss_5fold]
 
 std_val_loss = std(val_best_loss_5fold)
 std_val_acc = std(val_best_acc_5fold)
+std_val_acc_at_best_loss = std(val_best_acc_at_best_loss_5fold)
 
 writer.add_scalar("Std_val_best_loss", std_val_loss, 1)
 writer.add_scalar("Std_val_best_accuracy", std_val_acc, 1)
+writer.add_scalar("Std_val_best_accuracy_at_best_loss", std_val_acc_at_best_loss, 1)
 writer.close()
