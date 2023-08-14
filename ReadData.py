@@ -12,6 +12,15 @@ from torch.utils.data import DataLoader, Subset
 # from torch.utils.tensorboard import SummaryWriter
 
 
+def load_single_file_as_dataset(file_path, label):
+    df = pd.read_csv(file_path)
+    data_values = df.values
+    scaler = StandardScaler()
+    standardized_data = scaler.fit_transform(data_values)
+    data = [(standardized_data, label)]
+    return data
+
+
 def load_and_process_data(path):
     # Load data
     data = {}       # new dic to load data
@@ -157,6 +166,19 @@ class MyDataset(Dataset):
 
 
 # if __name__ == '__main__':
+#     data001_1 = load_single_file_as_dataset(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\original_data\trial1_sorted\0\001_1.csv", '0')
+#     train_dataset = MyDataset(data001_1)
+#     # build dataloader
+#     batch_size = 16
+#     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+#     # test data instance in dataloader
+#     for sample in train_loader:
+#         positions, targets = sample
+#         print(positions.shape)
+#         print(targets)
+    # train_dataset_len = len(train_dataset)
+    # print("The length of train dataset is :{}".format(train_dataset_len))
+
 #     # read data
 #     participants_data, participant_ids, stratify_labels, stratified_kfold = modified_cross_val_load_data(
 #         r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\trial1_sorted")
