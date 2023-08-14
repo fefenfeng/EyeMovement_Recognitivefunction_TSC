@@ -22,7 +22,12 @@ def process_files(source_folder, target_folder, indices):
 
 
 # 示例用法
-source_folder = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\original_data\trial0_sorted\1"
-target_folder = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\SubSequence\Trial0\Mixed_saccades_gap\1"
-indices = [28000, 40800]  # 子序列切分索引
+source_folder = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\SubSequence\Trial1\Stepped_random_motion\1"
+target_folder = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\SubSequence\Trial1\Stepped_random_motion_3\1"
+
+indices = [4800, 7200]  # 子序列切分索引
 process_files(source_folder, target_folder, indices)
+
+source_folder1 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\SubSequence\Trial1\Stepped_random_motion\0"
+target_folder1 = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\SubSequence\Trial1\Stepped_random_motion_3\0"
+process_files(source_folder1, target_folder1, indices)
