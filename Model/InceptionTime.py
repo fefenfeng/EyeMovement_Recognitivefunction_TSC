@@ -115,21 +115,21 @@ class InceptionTime(nn.Module):
         self.model = nn.Sequential(
             InceptionBlock(
                 in_channels=2,
-                n_filters=32,
+                n_filters=4,
                 kernel_sizes=[9, 19, 39],
                 bottleneck_size=32,
                 use_residual=True
             ),
             InceptionBlock(
-                in_channels=32*4,
-                n_filters=32,
+                in_channels=4*4,
+                n_filters=4,
                 kernel_sizes=[9, 19, 39],
                 bottleneck_size=32,
                 use_residual=True
             ),
             nn.AdaptiveAvgPool1d(output_size=1),
             nn.Flatten(),
-            nn.Linear(4*32*1, 2)
+            nn.Linear(4*4*1, 2)
         )
 
     def forward(self, x):
