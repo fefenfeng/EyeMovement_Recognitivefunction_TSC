@@ -21,6 +21,20 @@ def load_single_file_as_dataset(file_path, label):
     return data
 
 
+def load_data_with_index(path, index_range):
+    dataset = []
+    scaler = StandardScaler()
+    for label in ['0', '1']:
+        dir_path = os.path.join(path, label)
+        for file_name in os.listdir(dir_path):
+            file_path = os.path.join(dir_path, file_name)
+            df = pd.read_csv(file_path).iloc[index_range[0]:index_range[1]]
+            standardized_data = scaler.fit_transform(df.values)
+            dataset.append((standardized_data, label))
+
+    return dataset
+
+
 def load_and_process_data(path):
     # Load data
     data = {}       # new dic to load data
@@ -166,11 +180,17 @@ class MyDataset(Dataset):
 
 
 # if __name__ == '__main__':
-#     data001_1 = load_single_file_as_dataset(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\original_data\trial1_sorted\0\001_1.csv", '0')
-#     train_dataset = MyDataset(data001_1)
-#     # build dataloader
+#     testdata = load_data_with_index(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\SubSequence\Trial0\Prosaccades_gap", [0, 6400])
+#     test_dataset = MyDataset(testdata)
 #     batch_size = 16
-#     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+#     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
+
+    # data001_1 = load_single_file_as_dataset(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\original_data\trial1_sorted\0\001_1.csv", '0')
+    #
+    # train_dataset = MyDataset(data001_1)
+    # # build dataloader
+    # batch_size = 16
+    # train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 #     # test data instance in dataloader
 #     for sample in train_loader:
 #         positions, targets = sample
