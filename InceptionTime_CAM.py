@@ -11,7 +11,7 @@ from ReadData import load_single_file_as_dataset, MyDataset
 # load origin model
 inceptiontime = InceptionTime()
 state_path = "./State_dict/Trial1_subsequence_test/Step_ramp_tests_5/Fold_1.pth"
-inceptiontime.load_state_dict(torch.load((state_path)))
+inceptiontime.load_state_dict(torch.load(state_path))
 
 # print(inceptiontime)
 
