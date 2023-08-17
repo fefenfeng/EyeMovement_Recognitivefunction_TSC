@@ -6,11 +6,11 @@ from torch import nn
 class ResNetBlock(nn.Module):
     def __init__(self, in_channels, out_channels=64):
         super(ResNetBlock, self).__init__()
-        self.conv1 = nn.Conv1d(in_channels, out_channels, 7, 1, 3, bias=False)
+        self.conv1 = nn.Conv1d(in_channels, out_channels, 15, 1, 7, bias=False)
         self.bn1 = nn.BatchNorm1d(out_channels)
         self.relu1 = nn.ReLU()
 
-        self.conv2 = nn.Conv1d(out_channels, out_channels, 5, 1, 2, bias=False)
+        self.conv2 = nn.Conv1d(out_channels, out_channels, 9, 1, 4, bias=False)
         self.bn2 = nn.BatchNorm1d(out_channels)
         self.relu2 = nn.ReLU()
 
@@ -35,12 +35,12 @@ class ResNetBlock(nn.Module):
 class ResNet(nn.Module):
     def __init__(self):
         super(ResNet, self).__init__()
-        self.block1 = ResNetBlock(2, 64)
-        self.block2 = ResNetBlock(64, 64)
-        self.block3 = ResNetBlock(64, 64)
+        self.block1 = ResNetBlock(2, 16)
+        self.block2 = ResNetBlock(16, 16)
+        self.block3 = ResNetBlock(16, 16)
         self.gap = nn.AdaptiveAvgPool1d(1)
         self.flatten = nn.Flatten()
-        self.fc = nn.Linear(64, 2)
+        self.fc = nn.Linear(16, 2)
 
     def forward(self, x):
         x = self.block1(x)

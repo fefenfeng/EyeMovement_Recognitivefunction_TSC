@@ -5,23 +5,23 @@ import numpy as np
 from torch import nn
 from torch.utils.data import DataLoader
 
-from Model.InceptionTime import Inception, InceptionBlock, InceptionTime
+from Model.ResNet import ResNet
 from ReadData import load_single_file_as_dataset, MyDataset
 
 # load origin model
-inceptiontime = InceptionTime()
-state_path = "./State_dict/Trial0_left_split2/InceptionTime/Fold_1.pth"
-inceptiontime.load_state_dict(torch.load(state_path))
+resnet = ResNet()
+state_path = "./State_dict/Trial1_left_split2/Resnet/Fold_1.pth"
+resnet.load_state_dict(torch.load(state_path))
 
 # print(inceptiontime)
 
-class InceptionTime_CAM(nn.Module):
+class Resnet_CAM(nn.Module):
     def __init__(self):
-        super(InceptionTime_CAM, self).__init__()
-        self.features = nn.Sequential(*list(inceptiontime.model.children())[:-3])
-        self.gap = list(inceptiontime.model.children())[-3]
-        self.flat = list(inceptiontime.model.children())[-2]
-        self.fc = list(inceptiontime.model.children())[-1]
+        super(Resnet_CAM, self).__init__()
+        self.features = nn.Sequential(*list(resnet.children())[:-3])
+        self.gap = list(resnet.children())[-3]
+        self.flat = list(resnet.children())[-2]
+        self.fc = list(resnet.children())[-1]
         self.feature_map = None
 
     def forward(self, x):
@@ -32,13 +32,13 @@ class InceptionTime_CAM(nn.Module):
         x = self.fc(x)
         return x
 
-file_path = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\original_data\trial0_sorted\0\001_0.csv"
+file_path = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\original_data\trial1_sorted\0\001_1.csv"
 data001_1 = load_single_file_as_dataset(file_path, '0')
 train_dataset = MyDataset(data001_1)
 batch_size = 16
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-inceptiontime_cam = InceptionTime_CAM()
+resnet_cam = Resnet_CAM()
 
 for sample in train_loader:
     data, label = sample
@@ -46,12 +46,12 @@ for sample in train_loader:
 # print(data.shape)
 # print(label)
 
-output = inceptiontime_cam(data)
+output = resnet_cam(data)
 print(output.argmax(1).item())
 
-weights = inceptiontime_cam.fc.weight.detach()
+weights = resnet_cam.fc.weight.detach()
 weights = weights.transpose(0, 1)
-cam = torch.einsum('ijk,jl->ilk', inceptiontime_cam.feature_map, weights)
+cam = torch.einsum('ijk,jl->ilk', resnet_cam.feature_map, weights)
 
 # # Apply a ReLu activation
 # cam = nn.functional.relu(cam)
