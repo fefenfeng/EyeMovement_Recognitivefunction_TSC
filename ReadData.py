@@ -35,6 +35,19 @@ def load_data_with_index(path, index_range):
     return dataset
 
 
+def load_all_data(path):
+    dataset = []
+    scaler = StandardScaler()
+    for label in ['0', '1']:
+        dir_path = os.path.join(path, label)
+        for file_name in os.listdir(dir_path):
+            file_path = os.path.join(dir_path, file_name)
+            df = pd.read_csv(file_path)
+            standardized_data = scaler.fit_transform(df.values)
+            dataset.append((standardized_data, label))
+
+    return dataset
+
 def load_and_process_data(path):
     # Load data
     data = {}       # new dic to load data
@@ -180,10 +193,19 @@ class MyDataset(Dataset):
 
 
 # if __name__ == '__main__':
+#
+#     alldata = load_all_data(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\original_data\trial0_sorted")
+#     test_dataset = MyDataset(alldata)
+#     batch_size = 16
+#     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
+
+
+
 #     testdata = load_data_with_index(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\SubSequence\Trial0\Prosaccades_gap", [0, 6400])
 #     test_dataset = MyDataset(testdata)
 #     batch_size = 16
 #     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
+
 
     # data001_1 = load_single_file_as_dataset(r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\original_data\trial1_sorted\0\001_1.csv", '0')
     #
@@ -198,6 +220,7 @@ class MyDataset(Dataset):
 #         print(targets)
     # train_dataset_len = len(train_dataset)
     # print("The length of train dataset is :{}".format(train_dataset_len))
+
 
 #     # read data
 #     participants_data, participant_ids, stratify_labels, stratified_kfold = modified_cross_val_load_data(
@@ -227,6 +250,7 @@ class MyDataset(Dataset):
         # batch_size = 16
         # train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
         # val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
+
 
 
     # # load data
