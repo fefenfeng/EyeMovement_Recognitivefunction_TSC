@@ -12,6 +12,15 @@ from torch.utils.data import DataLoader, Subset
 # from torch.utils.tensorboard import SummaryWriter
 
 
+def load_single_file_with_index(file_path, label, index_range):
+    df = pd.read_csv(file_path).iloc[index_range[0]:index_range[1]]
+    data_values = df.values
+    scaler = StandardScaler()
+    standardized_data = scaler.fit_transform(data_values)
+    data = [(standardized_data, label)]
+    return data
+
+
 def load_single_file_as_dataset(file_path, label):
     df = pd.read_csv(file_path)
     data_values = df.values
