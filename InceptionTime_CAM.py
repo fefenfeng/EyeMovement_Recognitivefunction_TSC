@@ -6,7 +6,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from Model.InceptionTime import InceptionTime
-from ReadData import load_single_file_as_dataset, MyDataset, load_all_data
+from ReadData import load_single_file_as_dataset, MyDataset, load_all_data, load_data_with_index, load_single_file_with_index
 
 class InceptionTime_CAM(nn.Module):
     def __init__(self, inceptiontime):
@@ -29,7 +29,7 @@ def calculate_mean_cam(weight_path):
     inceptiontime = InceptionTime()
     inceptiontime.load_state_dict(torch.load(weight_path))
     inceptiontime_cam = InceptionTime_CAM(inceptiontime)
-    all_cam = torch.zeros((2, 33920))
+    all_cam = torch.zeros((2, 1760))        # need to change when different data
     for sample in all_loader:
         data, label = sample
         output = inceptiontime_cam(data)
@@ -40,24 +40,30 @@ def calculate_mean_cam(weight_path):
     return all_cam / len(all_loader)
 
 # load all data and calculate mean CAM value
-folder_path = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\original_data\trial1_sorted"
-alldata = load_all_data(folder_path)
+folder_path = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\Time_based_split\Random_motion\Random_motion_val"
+alldata = load_data_with_index(folder_path, [1760, 3520])
+# alldata = load_all_data(folder_path)
 all_dataset = MyDataset(alldata)
 batch_size = 16
 all_loader = DataLoader(all_dataset, batch_size=batch_size, shuffle=True)
 
-# Paths for the five weights from the cross-validation
-weight_paths = [
-    "./State_dict/Trial1_left_split2/InceptionTime/Fold_1.pth",
-    "./State_dict/Trial1_left_split2/InceptionTime/Fold_2.pth",
-    "./State_dict/Trial1_left_split2/InceptionTime/Fold_3.pth",
-    "./State_dict/Trial1_left_split2/InceptionTime/Fold_4.pth",
-    "./State_dict/Trial1_left_split2/InceptionTime/Fold_5.pth"]
-# Calculate the mean_cam for each weight and sum them
-total_mean_cam = torch.zeros((2, 33920))
-for weight_path in weight_paths:
-    total_mean_cam += calculate_mean_cam(weight_path)
-final_mean_cam = total_mean_cam / 5
+# # 5-fold CAM over all data
+# # Paths for the five weights from the cross-validation
+# weight_paths = [
+#     "./State_dict/Trial1_left_split2/InceptionTime/Fold_1.pth",
+#     "./State_dict/Trial1_left_split2/InceptionTime/Fold_2.pth",
+#     "./State_dict/Trial1_left_split2/InceptionTime/Fold_3.pth",
+#     "./State_dict/Trial1_left_split2/InceptionTime/Fold_4.pth",
+#     "./State_dict/Trial1_left_split2/InceptionTime/Fold_5.pth"]
+# # Calculate the mean_cam for each weight and sum them
+# total_mean_cam = torch.zeros((2, 33920))
+# for weight_path in weight_paths:
+#     total_mean_cam += calculate_mean_cam(weight_path)
+# final_mean_cam = total_mean_cam / 5
+
+# single mean CAM over all data
+
+final_mean_cam = calculate_mean_cam("./State_dict/InceptionTime_State/Time_based_split/Random_motion_11.pth")
 
 # Percentile normalization
 lower, upper = np.percentile(final_mean_cam, [50, 99])
@@ -65,8 +71,9 @@ final_mean_cam = np.clip(final_mean_cam, lower, upper)  # clip values outside of
 final_mean_cam = (final_mean_cam - lower) / (upper - lower)  # scale the values to range [0,1]
 
 # single file read
-file_path = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\original_data\trial1_sorted\0\001_1.csv"
-data001_1 = load_single_file_as_dataset(file_path, '0')
+file_path = r"D:\MyFiles\UOB_Robotics22\Dissertation\data_info\Time_based_split/Random_motion\Random_motion_val\0\003_1.csv"
+data001_1 = load_single_file_with_index(file_path, '0', [1760, 3520])
+# data001_1 = load_single_file_as_dataset(file_path, '1')
 train_dataset = MyDataset(data001_1)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
