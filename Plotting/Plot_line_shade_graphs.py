@@ -2,6 +2,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+"""
+Plot line graphs with shade area representing the error area.
+Show both mean and standard value. Show results' distributions.
+Mean(line): performance expectations 
+Distributions(shades): performance stability
+"""
+
 
 def get_data(acc_files, loss_files):
     acc_data = [pd.read_csv(file)['Value'].tolist() for file in acc_files]
